@@ -14,7 +14,7 @@ path = textpath
 doc = fitz.open(path)
 
 text = ''
-with open('file.txt','w', encoding='utf-8') as fd:  
+with open('file','w', encoding='utf-8') as fd:  
     for page in doc:
         fancy_page = page.get_textpage().extractDICT()
         for block in fancy_page['blocks']:
