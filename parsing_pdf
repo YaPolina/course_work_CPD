@@ -14,11 +14,8 @@ path = textpath
 doc = fitz.open(path)
 
 text = ''
-count = 0
 with open('file.txt','w', encoding='utf-8') as fd:  
     for page in doc:
-        count = count + 1
-        print(count)
         fancy_page = page.get_textpage().extractDICT()
         for block in fancy_page['blocks']:
             for line in block['lines']:
