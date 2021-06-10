@@ -1,0 +1,48 @@
+import os, string
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as pyp
+import matplotlib as mpl
+
+from sklearn.feature_extraction.text import CountVectorizer
+from lda import LDA
+from bs4 import BeautifulSoup
+from calculate_novelty_transience_resonance import novelty_transience_resonance
+
+%matplotlib inline
+
+
+with open("Первый Съезд_lemmas_lower_without_stops.html", encoding="utf-8") as f:
+    texts = f.read()
+soup = BeautifulSoup(texts)
+speakers = []
+speeches = []
+for div in soup.find_all("div"):
+    speech = div.find_all("p")[0].get_text().strip()
+    speaker = div.find_all("speaker")[0].get_text().strip()
+    if(len(speech)>0):
+        speakers.append(speaker)
+        speeches.append(speech)
+        
+        
+# the script below is based on https://github.com/CogentMentat/NTRexample_FRevNCA/blob/master/learn_topics.py      
+CVzer = CountVectorizer(token_pattern=r"(?u)\b[^\W\d]{3,}\b",
+                    max_features=None,
+                    lowercase=True)
+doc_vcnts = CVzer.fit_transform(speeches)
+vocabulary = CVzer.get_feature_names()
+
+lda_model = LDA(20, n_iter=1000, refresh=50) 
+doc_topic = lda_model.fit_transform(doc_vcnts)
+topic_word = lda_model.topic_word_
+
+n_top_words = 15
+for i, topic_dist in enumerate(topic_word):
+    topic_words = np.array(vocabulary)[np.argsort(topic_dist)][:-n_top_words:-1]
+    print('Topic {}: {}'.format(i, ' '.join(topic_words)))
+    
+novelties, transiences, resonances = novelty_transience_resonance(doc_topic, 10)
+novelties = np.array(novelties)
+transiences = np.array(transiences)
+resonances = np.array(resonances)
+
