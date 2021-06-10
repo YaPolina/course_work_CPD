@@ -49,6 +49,5 @@ for index, speech in enumerate(soup.find_all('p')):
     speech.string = lemmatize(speech.string) 
 
 
-
 with open ('Первый Съезд_lemmas_lower_without_stops.html', 'w', encoding = 'utf-8') as html_file:
     html_file.write(str(soup))
